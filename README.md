@@ -45,6 +45,22 @@ Karakteri analizi için oldukça revaçta olan Myers- Briggs Kişilik Tipi Test 
 
 <img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/karakter.JPG">
 
-Biz de proje de bu kategorizasyondan yararlanarak kullanıcımızın twitter datasını analiz ettik ve aşağıdaki çıktıya ulaştık.
+Biz de proje de bu kategorizasyondan yararlanarak kullanıcımızın twitter datasını analiz ettik ve aşağıdaki çıktılara ulaştık.
 
+<img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/vedat_all.png">
 
+<img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/vedat_topic.png">
+
+Bir diğer örnek twitter kullanıcı Fatih Kadir Akın için çıktılar aşağıdaki gibidir..
+
+Normalizasyon sonrası ayıklanmış verilerinden edinilen kelime bazlı frekans grafiği:
+
+<img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/fkadev_table.png">
+
+Tweet verilerinden edinilen popüler başlıklar:
+
+<img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/fkadev_topic.png">
+
+Mention verilerine göre en popüler isimler:
+
+<img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/fkadev_users.png">
