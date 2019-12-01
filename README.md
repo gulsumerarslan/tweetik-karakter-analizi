@@ -21,11 +21,15 @@ Bu esneklik en nihayetinde ortaya konan 'Stop Words' veri setinin ihtiyaç doğr
 
 Ortam değişkenlerini sağlamak için gerekli kütüphaneleri yüklemek için:
 
-```pip install requirements.txt
+```
+pip install requirements.txt
+
 ```
 Ardından projeyi twitter kullanıcı adı ile aşağıdaki gibi çalıştırabilirsiniz.
 
-```python .\test.py <username>
+```
+python .\test.py <username>
+
 ```
 Plotly kütüphanesi yardımı ile oluşan bar chart, kullanıcı istatistikleri gürültü oluşturan konudan bağımsız kelimelerden arındırılarak kalan küme içerisinde en yoğun anlamlı kelimeleri ölçekler.
 
