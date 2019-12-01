@@ -11,6 +11,7 @@ import emoji
 import sys
 import re
 import string
+import os
 
 
 
@@ -55,10 +56,10 @@ def show_cloud(listData,typeFormat):
 
 def get_tweets():
     #twitter authentication
-    CONSUMER_KEY        = 'soqfmhM49WyCCsdRVYUWi0Fv0'
-    CONSUMER_SECRET     = 'Z4aSo3KNf8HqSrdZnspK6UyYSunr0rlXL81bKaRmGK29ySw20c'
-    ACCESS_TOKEN        = '156247020-4H3axzwNGpzM3sQbLw36N2Kp51DlnFyYySuHDUJL'
-    ACCESS_TOKEN_SECRET = 'QlNx3snGqgrLEKNNDFI9TPMgWVsyEXOr8C3obls3wqRAU'
+    CONSUMER_KEY        =  os.getenv('api-key')
+    CONSUMER_SECRET     =  os.getenv('api-secret-key')
+    ACCESS_TOKEN        =  os.getenv('access-token')
+    ACCESS_TOKEN_SECRET =  os.getenv('access-secret-token')
     AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     AUTH.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     api = tweepy.API(AUTH)
