@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import codecs
 import imageio
 import matplotlib.pyplot as plt
@@ -14,82 +17,125 @@ import string
 import os
 
 
+TEMP_STOP_WORDS = list(__import__("stop_words").STOP_WORDS)
+
+
+def get_stop_words(listData):
+
+    TEMP_STOP_WORDS.append("https")
+    TEMP_STOP_WORDS.append("RT")
+    TEMP_STOP_WORDS.append("co")
+    TEMP_STOP_WORDS.append("rt")
+    TEMP_STOP_WORDS.append("rt'")
+    TEMP_STOP_WORDS.append("rt '")
+    TEMP_STOP_WORDS.append("bir")
+    TEMP_STOP_WORDS.append(",")
+    TEMP_STOP_WORDS.append(":)")
+    TEMP_STOP_WORDS.append(":d")
+
+    if not listData:
+        return(set(TEMP_STOP_WORDS))
+    else:
+        TEMP_STOP_WORDS.extend(listData)
+        return(set(TEMP_STOP_WORDS))
+
+
+STOP_WORDS = get_stop_words(None)
+SHERLOCK_MASK = imageio.imread("sherlock.png")
+ARGS = sys.argv
+USERNAME = ARGS[1] if 1 < len(ARGS) else None
+CONSUMER_KEY = os.getenv('api-key') or (ARGS[2] if 2 < len(ARGS) else None)
+CONSUMER_SECRET = os.getenv(
+    'api-secret-key') or ARGS[3] if 3 < len(ARGS) else None
+ACCESS_TOKEN = os.getenv('access-token') or ARGS[4] if 4 < len(ARGS) else None
+ACCESS_TOKEN_SECRET = os.getenv(
+    'access-secret-token') or ARGS[5] if 5 < len(ARGS) else None
+
 
 def get_user_tweets(api, username, count=200):
-    tweets = api.user_timeline(username, count=count)        
+    tweets = api.user_timeline(username, count=count)
     texts = [tweet.text for tweet in tweets]
     return texts
 
-def get_mentions_names(tweets2):    
-    users=[]
-    usernamesForTwitter = re.findall( r'(^|[^@\w])@(\w{1,15})\b',tweets2)
+
+def get_mentions_names(tweets2):
+    users = []
+    usernamesForTwitter = re.findall(r'(^|[^@\w])@(\w{1,15})\b', tweets2)
     for user in usernamesForTwitter:
-        users.append(user[1])    
+        users.append(user[1])
     return users
+
 
 def show_html_table(words):
     data = [go.Bar(
-            x = words.index.values[:30],
-            y = words.values[:30],
-            marker= dict(colorscale='Jet',
-            color = words.values[:30]),
+            x=words.index.values[:30],
+            y=words.values[:30],
+            marker=dict(colorscale='Jet',
+                        color=words.values[:30]),
             text='ranking'
-        )]
+            )]
     layout = go.Layout(
         title='Word Frequency Ranking'
     )
     fig = go.Figure(data=data, layout=layout)
-    py.plot(fig, filename=username)    
+    py.plot(fig, filename=USERNAME)
 
-def show_cloud(listData,typeFormat):    
-    a = ' '.join(str(v) for v in listData)  
-    wc = WordCloud(background_color="black", max_words=1000, mask=sherlock_mask, stopwords=stopwords)
+
+def show_cloud(listData, typeFormat):
+    a = ' '.join(str(v) for v in listData)
+    wc = WordCloud(background_color="black", max_words=1000,
+                   mask=SHERLOCK_MASK, stopwords=STOP_WORDS)
     wc.generate(a)
-    filename=typeFormat+'.png'
-    wc.recolor(colormap='PuBu' , random_state=42).to_file(filename)
-    #plt.figure(figsize=(80,80))
+    filename = typeFormat+'.png'
+    wc.recolor(colormap='PuBu', random_state=42).to_file(filename)
+    # plt.figure(figsize=(80,80))
     #plt.imshow(wc.recolor(colormap='PuBu' , random_state=42),interpolation='bilinear')
-    #plt.axis("off")
-    #plt.show(block=False)
-    
-def get_analysis(retweets,tweets,mentions):
+    # plt.axis("off")
+    # plt.show(block=False)
+
+
+def get_analysis(retweets, tweets, mentions):
     df_retweets = pd.DataFrame({'retweets': retweets})
     df_tweets = pd.DataFrame({'tweets': tweets})
     df_mentions = pd.DataFrame({'mentions': mentions})
 
-    df_all=pd.concat([df_retweets,df_tweets,df_mentions],ignore_index=True, axis=1)
-    df_all.columns = [ 'Retweets','Tweets', 'Mentions']
-    df_all= df_all.applymap(lambda s:s.lower() if type(s) == str else s)
-    #print(df_all.head())
+    df_all = pd.concat([df_retweets, df_tweets, df_mentions],
+                       ignore_index=True, axis=1)
+    df_all.columns = ['Retweets', 'Tweets', 'Mentions']
+    df_all = df_all.applymap(lambda s: s.lower() if type(s) == str else s)
+    # print(df_all.head())
 
-    #for m in df_all['Tweets']:
-        #print(m)
-    disa_donuk=['!',"konser","arkadaş","oley",'hadi',"hey",'tatlım','canım','kuzum','bebek','bebeğim','mükemmel','şaka',
-              'selam','kutlarım','sosyal']
-    ice_donuk=['yalnız','keşke','pişman','ağla','gözyaşı','utanç','hayır','peki','belki','bilgilendirici','ciddi']
+    # for m in df_all['Tweets']:
+    # print(m)
+    disa_donuk = ['!', "konser", "arkadaş", "oley", 'hadi', "hey", 'tatlım', 'canım', 'kuzum', 'bebek', 'bebeğim', 'mükemmel', 'şaka',
+                  'selam', 'kutlarım', 'sosyal']
+    ice_donuk = ['yalnız', 'keşke', 'pişman', 'ağla', 'gözyaşı',
+                 'utanç', 'hayır', 'peki', 'belki', 'bilgilendirici', 'ciddi']
 
-    gercekci=['mümkün','net','olamaz','olur','oldu','olacak','tamam']
-    sezgisel=['belki','muhtemelen','acaba','ihtimal','his','düş','rüya','sevgi','sevmek','sezgi','seviyorum','hayranım',
-             'gerçeklik']
+    gercekci = ['mümkün', 'net', 'olamaz', 'olur', 'oldu', 'olacak', 'tamam']
+    sezgisel = ['belki', 'muhtemelen', 'acaba', 'ihtimal', 'his', 'düş', 'rüya', 'sevgi', 'sevmek', 'sezgi', 'seviyorum', 'hayranım',
+                'gerçeklik']
 
-    dusunen=['düşünce','düşünüyorum','aslında','mantıklı','doğru','yanlış','tespit','olmalı','tahmin','anlamlı','manalı','şüpheli',
-         'şüpheci','çünkü']
-    hassas=['kırık','buruk','hüzün','kırgın','ağla','yeterince','teşekkür','hassas','kırılgan']
+    dusunen = ['düşünce', 'düşünüyorum', 'aslında', 'mantıklı', 'doğru', 'yanlış', 'tespit', 'olmalı', 'tahmin', 'anlamlı', 'manalı', 'şüpheli',
+               'şüpheci', 'çünkü']
+    hassas = ['kırık', 'buruk', 'hüzün', 'kırgın', 'ağla',
+              'yeterince', 'teşekkür', 'hassas', 'kırılgan']
 
-    sorgulayan=['neden','ne','nerede','niçin''ara','zaman','saat','ilk','son','net']
-    algılari_acik=['öğrendim','öğretici','bence',]
+    sorgulayan = ['neden', 'ne', 'nerede', 'niçin''ara',
+                  'zaman', 'saat', 'ilk', 'son', 'net']
+    algilari_acik = ['öğrendim', 'öğretici', 'bence', ]
 
-    #Dışa dönük / Gerçekçi / Düşünen / Sorgulayan
-    Kisilik_1=[]
+    # Dışa dönük / Gerçekçi / Düşünen / Sorgulayan
+    Kisilik_1 = []
 
-    #İçe dönük / Gerçekçi / Düşünen / Sorgulayan
-    Kisilik_2=[]
+    # İçe dönük / Gerçekçi / Düşünen / Sorgulayan
+    Kisilik_2 = []
 
-    #Dışa dönük / Gerçekçi / Hassas / Sorgulayan
-    Kisilik_3=[]
+    # Dışa dönük / Gerçekçi / Hassas / Sorgulayan
+    Kisilik_3 = []
 
-    #İçe dönük / Gerçekçi / Hassas / Sorgulayan
-    Kisilik_4=[]
+    # İçe dönük / Gerçekçi / Hassas / Sorgulayan
+    Kisilik_4 = []
 
     total_disa_donuk = df_all['Tweets'].str.contains('|'.join(disa_donuk))
     total_ice_donuk = df_all['Tweets'].str.contains('|'.join(ice_donuk))
@@ -99,174 +145,167 @@ def get_analysis(retweets,tweets,mentions):
 
     total_dusunen = df_all['Tweets'].str.contains('|'.join(dusunen))
     total_hassas = df_all['Tweets'].str.contains('|'.join(hassas))
-                                           
+
     total_sorgulayan = df_all['Tweets'].str.contains('|'.join(sorgulayan))
-    total_algılari_acik = df_all['Tweets'].str.contains('|'.join(algılari_acik))
+    total_algilari_acik = df_all['Tweets'].str.contains(
+        '|'.join(algilari_acik))
 
-    df_total=pd.concat([total_disa_donuk,total_ice_donuk,total_gercekci,total_sezgisel,total_dusunen,total_hassas,total_sorgulayan,total_algılari_acik],ignore_index=True, axis=1)
-    df_total.columns = [ 'disa_donuk','ice_donuk','gercekci','sezgisel','dusunen','hassas','sorgulayan','algılari_acik']                                         
+    df_total = pd.concat([total_disa_donuk, total_ice_donuk, total_gercekci, total_sezgisel,
+                          total_dusunen, total_hassas, total_sorgulayan, total_algilari_acik], ignore_index=True, axis=1)
+    df_total.columns = ['disa_donuk', 'ice_donuk', 'gercekci',
+                        'sezgisel', 'dusunen', 'hassas', 'sorgulayan', 'algılari_acik']
 
-    #print(df_total.head(10))
+    # print(df_total.head(10))
 
-    Dıs=df_total['disa_donuk'][df_total['disa_donuk']==True].count().sum()
-    Ic=df_total['ice_donuk'][df_total['ice_donuk']==True].count().sum()
+    Dis = df_total['disa_donuk'][df_total['disa_donuk'] == True].count().sum()
+    Ic = df_total['ice_donuk'][df_total['ice_donuk'] == True].count().sum()
 
-    if(Dıs>Ic):
+    if(Dis > Ic):
         print("Dışa Dönük ! ")
-    elif(Dıs==Ic):
+    elif(Dis == Ic):
         print("Dışa ve İçe Dönüklük Dengeli.")
     else:
-        print("İçe Dönük...") 
+        print("İçe Dönük...")
 
-    G=df_total['gercekci'][df_total['gercekci']==True].count().sum()
-    S=df_total['sezgisel'][df_total['sezgisel']==True].count().sum()
+    G = df_total['gercekci'][df_total['gercekci'] == True].count().sum()
+    S = df_total['sezgisel'][df_total['sezgisel'] == True].count().sum()
 
-    if(G>S):
+    if(G > S):
         print("Gerçekçi ! ")
     elif(G == S):
         print("Gerçekçi ve Sezgisel Duyumlar Dengeli.")
     else:
         print("Sezgisel...")
 
-    D=df_total['dusunen'][df_total['dusunen']==True].count().sum()
-    H=df_total['hassas'][df_total['hassas']==True].count().sum()
+    D = df_total['dusunen'][df_total['dusunen'] == True].count().sum()
+    H = df_total['hassas'][df_total['hassas'] == True].count().sum()
 
-    if(D>H):
+    if(D > H):
         print("Düşünen..")
-    elif(D==H):
+    elif(D == H):
         print("Düşünen ve Hassas Dengeli.")
     else:
-        print("Hassas...") 
-        
-    Sor=df_total['sorgulayan'][df_total['sorgulayan']==True].count().sum()
-    Alg=df_total['algılari_acik'][df_total['algılari_acik']==True].count().sum()
+        print("Hassas...")
 
-    if(Sor>Alg):
+    Sor = df_total['sorgulayan'][df_total['sorgulayan'] == True].count().sum()
+    Alg = df_total['algılari_acik'][df_total['algılari_acik']
+                                    == True].count().sum()
+
+    if(Sor > Alg):
         print("Sorgulayan..")
-    elif(Sor==Alg):
+    elif(Sor == Alg):
         print("Sorgulayan ve Algıları Açık Dengeli.")
     else:
         print("Algıları Açık...")
 
-    
 
 def get_tweets():
-    #twitter authentication
-    CONSUMER_KEY        =  os.getenv('api-key')
-    CONSUMER_SECRET     =  os.getenv('api-secret-key')
-    ACCESS_TOKEN        =  os.getenv('access-token')
-    ACCESS_TOKEN_SECRET =  os.getenv('access-secret-token')
+    # twitter authentication
     AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     AUTH.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     api = tweepy.API(AUTH)
-    return(get_user_tweets(api, username),api.get_user(username).name)
+    return(get_user_tweets(api, USERNAME), api.get_user(USERNAME).name)
 
-def get_stop_words(listData):
-    
-    tempStopWord.append("https")
-    tempStopWord.append("RT")
-    tempStopWord.append("co")
-    tempStopWord.append("rt")
-    tempStopWord.append("rt'")
-    tempStopWord.append("rt '")
-    tempStopWord.append("bir")
-    tempStopWord.append(",")
-    tempStopWord.append(":)")
-    tempStopWord.append(":d")
-
-    if not listData:
-        return(set(tempStopWord))
-    else:
-        tempStopWord.extend(listData)
-        return(set(tempStopWord))
-
-
-  
-    
 
 def get_clear_data(oldData):
-    cevap=0
-    rt=0
-    tw=0
+    cevap = 0
+    rt = 0
+    tw = 0
     lower_map = {
-    ord(u'I'): u'ı',
-    ord(u'İ'): u'i',
-    ord(u'Ç'): u'ç',
-    ord(u'Ğ'): u'ğ',
-    ord(u'Ö'): u'ö',
-    ord(u'O'): u'o',
-    ord(u'U'): u'u',
-    ord(u'Ü'): u'ü',
-    ord(u'Ş'): u'ş',
-    ord(u'S'): u's',
+        ord(u'I'): u'ı',
+        ord(u'İ'): u'i',
+        ord(u'Ç'): u'ç',
+        ord(u'Ğ'): u'ğ',
+        ord(u'Ö'): u'ö',
+        ord(u'O'): u'o',
+        ord(u'U'): u'u',
+        ord(u'Ü'): u'ü',
+        ord(u'Ş'): u'ş',
+        ord(u'S'): u's',
     }
-    analaysisTweets=[]
-    tweets=[]
-    mentions=[]
-    retweets=[]
+    analaysisTweets = []
+    tweets = []
+    mentions = []
+    retweets = []
     for data in oldData:
         if data[0] == "@":
-            cevap =  cevap + 1
+            cevap = cevap + 1
             mentions.append(data)
         elif data[0:2] == "RT":
             rt = rt + 1
             retweets.append(data)
         else:
-            tw = tw + 1            
+            tw = tw + 1
             analaysisTweets.append(data)
-        if data not in stopwords:            
-            for dataSplit in data.split(" "):            
-                if dataSplit not in stopwords:
-                    if any(ext in dataSplit for ext in stopwords):
-                        tweets.append(dataSplit)  
-                              
-                    
-    datas=[]
-    for tweet in tweets:    
-        for word in tweet.split(" "):        
+        if data not in STOP_WORDS:
+            for dataSplit in data.split(" "):
+                if dataSplit not in STOP_WORDS:
+                    if any(ext in dataSplit for ext in STOP_WORDS):
+                        tweets.append(dataSplit)
+
+    datas = []
+    for tweet in tweets:
+        for word in tweet.split(" "):
             datas.append(emoji.demojize(word.translate(lower_map).lower()))
     if any(ext in "muh" for ext in datas):
         print("url_string")
-    return (datas,analaysisTweets,mentions,retweets)
-pm = __import__("stop_words")
-tempStopWord=list(pm.STOP_WORDS)
-image = imageio.imread("sherlock.png")
-sherlock_mask = image
-args = sys.argv
-username = args[1]
-locale.setlocale(locale.LC_ALL, 'tr_TR.utf8')
-stopwords = get_stop_words(None)
-name = get_tweets()[1]
-data_new= get_clear_data(get_tweets()[0])
-train = pd.DataFrame(data_new[0]) 
-words=train.unstack().value_counts()
-
-get_analysis(data_new[3],data_new[1],data_new[2])
-
-a = ' '.join(str(v) for v in train.values.tolist())
-print(len(a))
-show_cloud(train.values.tolist(),"all")
-show_cloud(get_mentions_names(a),"users")
+    return (datas, analaysisTweets, mentions, retweets)
 
 
+if __name__ == "__main__":
+    if USERNAME is None:
+        print("Kullanıcı adını girmediniz.")
+        sys.exit()
 
-userListstopword = ["@" + name for name in get_mentions_names(a)]
-get_stop_words(userListstopword)
-get_stop_words(get_mentions_names(a))
-get_stop_words([ name+" '" for name in get_mentions_names(a)])
-stopwords=get_stop_words([ name+"'" for name in get_mentions_names(a)])
+    if CONSUMER_KEY is None:
+        print("Twitter consumer key'i girmediniz.")
+        sys.exit()
 
+    if CONSUMER_SECRET is None:
+        print("Twitter consumer secret'ı girmediniz.")
+        sys.exit()
 
-train=None
-words=None
-#with open("out.txt", "w", encoding="utf-8") as f:
-    #f.write("$".join(stopwords))
-data_new = get_clear_data(get_tweets()[0])
-train = pd.DataFrame( data_new[0]) 
-words=train.unstack().value_counts()
+    if ACCESS_TOKEN is None:
+        print("Twitter access token'ı girmediniz.")
+        sys.exit()
 
-show_cloud(train.values.tolist(),"topic")
-show_html_table(words)
+    if ACCESS_TOKEN_SECRET is None:
+        print("Twitter access token secret'ı girmediniz.")
+        sys.exit()
 
-#with open("outword.txt", "w", encoding="utf-8") as f:
-#    f.write('$'.join(str(v) for v in train.values.tolist()))
+    try:
+        locale.setlocale(locale.LC_ALL, 'tr_TR.UTF-8')
+    except:
+        locale.setlocale(locale.LC_ALL, 'tr_TR.UTF8')
+
+    name = get_tweets()[1]
+    data_new = get_clear_data(get_tweets()[0])
+    train = pd.DataFrame(data_new[0])
+    words = train.unstack().value_counts()
+
+    get_analysis(data_new[3], data_new[1], data_new[2])
+
+    a = ' '.join(str(v) for v in train.values.tolist())
+    print(len(a))
+    show_cloud(train.values.tolist(), "all")
+    show_cloud(get_mentions_names(a), "users")
+
+    userListstopword = ["@" + name for name in get_mentions_names(a)]
+    get_stop_words(userListstopword)
+    get_stop_words(get_mentions_names(a))
+    get_stop_words([name+" '" for name in get_mentions_names(a)])
+    stopwords = get_stop_words([name+"'" for name in get_mentions_names(a)])
+
+    train = None
+    words = None
+    # with open("out.txt", "w", encoding="utf-8") as f:
+    # f.write("$".join(stopwords))
+    data_new = get_clear_data(get_tweets()[0])
+    train = pd.DataFrame(data_new[0])
+    words = train.unstack().value_counts()
+
+    show_cloud(train.values.tolist(), "topic")
+    show_html_table(words)
+
+    # with open("outword.txt", "w", encoding="utf-8") as f:
+    #    f.write('$'.join(str(v) for v in train.values.tolist()))

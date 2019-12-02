@@ -2,7 +2,7 @@
 
 Twitter etkileşimleri ile kişilerin karakter analizi.
 
-Günümüzde twitter kullanıcıları etkileşimelleri ile düşünce yapısı, karakteristik özellikleri ve ruh hali gibi birçok konuda kişisel veriler sunarak karakter analizi konusunda birçok veri barındırır. 
+Günümüzde twitter kullanıcıları etkileşimelleri ile düşünce yapısı, karakteristik özellikleri ve ruh hali gibi birçok konuda kişisel veriler sunarak karakter analizi konusunda birçok veri barındırır.
 
 <img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/tweet.jpeg">
 
@@ -10,27 +10,36 @@ Bu projede tweet,retweet ve mention verileri dikkate alınarak kariyer yönetici
 
 Alternatif Türkçe doğal dil işleme kütüphanelerine bir göz atalım:
 
-Kütüphane | Avantajları | Dezavantajları
------------- | ------------ | -------------
-Zemberek-NLP | Morfolojik kök-bağlam ilşkisi güçlü. | Gürültülü text verisini arındırabilecek 'stop-words' desteği yetersiz.
-NLTK | Türkçe text ayıklama işlevi mevcut. | 'Stop-words' veri seti kısıtlı.
-spaCY | Gürüntü arındırma konusunda yetkin. | Türkçe kelime ayıklama desteği geliştirilmeli.
+| Kütüphane    | Avantajları                          | Dezavantajları                                                         |
+| ------------ | ------------------------------------ | ---------------------------------------------------------------------- |
+| Zemberek-NLP | Morfolojik kök-bağlam ilşkisi güçlü. | Gürültülü text verisini arındırabilecek 'stop-words' desteği yetersiz. |
+| NLTK         | Türkçe text ayıklama işlevi mevcut.  | 'Stop-words' veri seti kısıtlı.                                        |
+| spaCY        | Gürüntü arındırma konusunda yetkin.  | Türkçe kelime ayıklama desteği geliştirilmeli.                         |
 
-Bu kütüphanelerin her birini çalışmalarımız sırasında test ettik ve verimlilik açısından Türkçe gürültü arındırma desteği kütüphanelere henüz çok yeni dahil olmaya başladığından tek bir kütüphaneye bağlı kalmaksızın  geliştirmelerimizi mevcut yapıyı pekiştirerek geliştirdik.
+Bu kütüphanelerin her birini çalışmalarımız sırasında test ettik ve verimlilik açısından Türkçe gürültü arındırma desteği kütüphanelere henüz çok yeni dahil olmaya başladığından tek bir kütüphaneye bağlı kalmaksızın geliştirmelerimizi mevcut yapıyı pekiştirerek geliştirdik.
 Bu esneklik en nihayetinde ortaya konan 'Stop Words' veri setinin ihtiyaç doğrultusunda genişletilmesini sağladı.
 
 Ortam değişkenlerini sağlamak için gerekli kütüphaneleri yüklemek için:
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 
 ```
-Ardından projeyi twitter kullanıcı adı ile aşağıdaki gibi çalıştırabilirsiniz.
+
+Ardından projeyi twitter kullanıcı adı ile aşağıdaki gibi çalıştırabilirsiniz. _(Twitter consumer key, consumer secret, access token ve access token secret değerleri ortam değişkeni olarak eklenmelidir.)_
 
 ```
 python .\test.py <username>
 
 ```
+
+Twitter API bağlantısı için gerekli olan key ve secret değerlerini parametre olarak geçerek de projeyi aşağıdaki gibi çalıştırabilirsiniz.
+
+```
+python .\test.py <username> <consumer_key> <consumer_secret> <access_token> <access_token_secret>
+
+```
+
 Plotly kütüphanesi yardımı ile oluşan bar chart, kullanıcı istatistikleri gürültü oluşturan konudan bağımsız kelimelerden arındırılarak kalan küme içerisinde en yoğun anlamlı kelimeleri ölçekler.
 
 <img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/bar_chart_.jpg">
@@ -44,7 +53,7 @@ Elde edilen verileri bir dataframe içerisinde bir araya getirdik, detayları a�
 
 <img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/dataframe.JPG">
 
-Karakteri analizi için oldukça revaçta olan Myers- Briggs Kişilik Tipi Test tekniğini dikkate aldık. Bu teknik aşağıdaki başlıklarda karakter özelliklerini kategorize ederek bu metriklerin kombinasyonu ile elde edilen ana karakteri öne çıkarıyor. 
+Karakteri analizi için oldukça revaçta olan Myers- Briggs Kişilik Tipi Test tekniğini dikkate aldık. Bu teknik aşağıdaki başlıklarda karakter özelliklerini kategorize ederek bu metriklerin kombinasyonu ile elde edilen ana karakteri öne çıkarıyor.
 
 <img src="https://github.com/gulsume/tweetik-karakter-analizi/blob/master/Images/karakter.JPG">
 
